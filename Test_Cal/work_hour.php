@@ -22,6 +22,7 @@ class Calendar {
     private $selectedWeek = 0;
     private $displayedWeek = 0;
     private $dateToWorkedHours = [];
+    private $booked_hours_err = '';
      
     /********************* PUBLIC **********************/  
         
@@ -126,6 +127,9 @@ class Calendar {
         $content.='<div class="clear"></div>';     
              
         $content.='</div>';
+        $content.='<div>';
+        $content.= ''.$this->booked_hours_err;
+        $content.='</div>';
         $content.='<input type="submit" name="button1" class="button" value="Submit"/>';
                  
         $content.='</div>';
@@ -187,8 +191,12 @@ class Calendar {
 
     private function _saveHoursBooked($workDate,$hoursBooked){
         echo $workDate.'****'.$hoursBooked.'????';
+        if($hoursBooked<0 || $hoursBooked >24){
+            $this->booked_hours_err = "Please enter value between 0 and 24.";
+        }
         $sql = "SELECT * FROM booking WHERE booking_date = ?";
         $link = $this->_getMySQLLink();
+        if($this->booked_hours_err == ''){
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
             mysqli_stmt_bind_param($stmt, "s", $param_id);
@@ -217,7 +225,7 @@ class Calendar {
             }
         }
         mysqli_stmt_close($stmt);
-
+    }
     }
 
     private function _insertHoursBooked($dateForBooking,$hoursBooked){
